@@ -87,7 +87,7 @@ fs.readFile(trainingFile, "utf8", function(error, train) {
 
 
 		// predict class
-		var k = 5;	// hyperparameter
+		var k = 1;	// hyperparameter
 		var n=0;
 		var nOne=0;
 		var nTwo=0;
