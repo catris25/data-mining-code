@@ -24,12 +24,14 @@ fs.readFile(trainingFile, "utf8", function(error, train) {
 
 	console.log(trainingData);
 
+	// create array to store data of mean and var per attribute
 	var meanEWS = new Array();
 	var varEWS = new Array();
 
 	var meanBL = new Array();
 	var varBL = new Array();
 
+	// create array to store data per attribute per class
 	var attrEWS=new Array();
 	var attrBL=new Array();
 
@@ -39,32 +41,41 @@ fs.readFile(trainingFile, "utf8", function(error, train) {
 		attrEWS[i]= new Array();
 		attrBL[i] = new Array();
 
+		// counting how many EWS and BL data there are each
+		var allEWS = 0;
+		var allBL = 0;
 		for(var j=0; j<(trainingData.length); j++){
 			if(trainingData[j][4]=='EWS'){
-				console.log("EWS"+trainingData[j][i]);
 				attrEWS[i].push(trainingData[j][i]);
-				
+				allEWS++;
 							
 			}else{
-				console.log("BL"+trainingData[j][i]);
 				attrBL[i].push(trainingData[j][i]);
+				allBL++;
 				
 			}
 		}
 		
 	}
 
+	// calculating mean and var of EWS
 	for(var i=0; i<attrEWS.length; i++){
 		meanEWS[i] = math.mean(attrEWS[i]);
 		varEWS[i] = math.var(attrEWS[i]);
 
 	}
 
+	// calculating mean and var of BL
 	for(var i=0; i<attrBL.length; i++){
 		meanBL[i] = math.mean(attrBL[i]);
 		varBL[i] = math.var(attrBL[i]);
 	}
+
+	// calculating posterior probability
+	var posteriorEWS = allEWS/trainingData.length;
+	var posteriorBL = allBL/trainingData.length;
 	
+	// calculating likelihood
 	var likeEWS = new Array();
 	var likeBL = new Array();
 
@@ -74,16 +85,15 @@ fs.readFile(trainingFile, "utf8", function(error, train) {
 	for(var i=0; i<attrEWS.length; i++)	{
 
 		likeEWS[i] = (1/math.sqrt(2*pi*varEWS[i])) * math.pow(e, -(math.pow((testingData[i]-meanEWS[i]),2))/(2*varEWS[i]));
-		// console.log(i+". "+likeEWS[i])
 	}
 	
 	for(var i=0; i<attrBL.length; i++)	{
 
 		likeBL[i] = (1/math.sqrt(2*pi*varBL[i])) * math.pow(e, -(math.pow((testingData[i]-meanBL[i]),2))/(2*varBL[i]));
-		// console.log(i+". "+likeBL[i])
 	}
 	
 	var temp = 1;
+
 	for(var i=0; i<likeEWS.length; i++)	{
 		temp=temp*likeEWS[i];
 	}
@@ -95,7 +105,18 @@ fs.readFile(trainingFile, "utf8", function(error, train) {
 	}
 	var eviBL = temp;	
 	
+	var probEWS = eviEWS*posteriorEWS;
+	var probBL = eviBL*posteriorBL;
 
+	console.log("P(EWS) = "+probEWS);
+	console.log("P(BL) = "+probBL);
 
+	// conclusion
+	console.log("Result:");
+	if(probEWS>probBL){
+		console.log("Testing data is predicted to be EWS.");
+	}else{
+		console.log("Testing data is predicted to be BL.");
+	}
 });
 
