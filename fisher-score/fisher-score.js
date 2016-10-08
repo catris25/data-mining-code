@@ -15,7 +15,6 @@ fs.readFile(fileName, "utf8", function(error, data) {
 	  
 	}
 
-	console.log(inputData);
 
 	// create array to store data per attribute per class
 	var attrSoccer=new Array();
@@ -44,6 +43,20 @@ fs.readFile(fileName, "utf8", function(error, data) {
 		
 	}
 
+	var meanAttr = new Array();
+	for(var i=0; i<attrNum;i++){
+		
+		var temp= [];
+		for(var j=0; j<3; j++){
+			temp.push(attrSoccer[i][j]);
+			temp.push(attrSumo[i][j]);
+		}
+		
+		meanAttr[i] = math.mean(temp);
+	}
+
+	
+
 	var meanSoccer = new Array();
 	var varSoccer = new Array();
 
@@ -69,11 +82,15 @@ fs.readFile(fileName, "utf8", function(error, data) {
 	var fisherScore = new Array();
 	for(var i=0; i<2; i++){
 		fisherScore[i]=(allSoccer*allSumo)/(allSoccer+allSumo)*(math.pow((meanSoccer[i]-meanSumo[i]),2))/(varSumo[i]*allSumo+varSoccer[i]*allSoccer);
-		var printRumus = "("+allSoccer+"*"+allSumo+")/("+allSoccer+"+"+allSumo+")*("+meanSoccer[i]+"-"+meanSumo[i]+")^2/("+varSumo[i]+"*"+allSumo+"+"+varSoccer[i]+"*"+allSoccer+");";
-		console.log(printRumus);
 		console.log("fisherScore["+i+"] : "+fisherScore[i]);
 	}
-																
 
+	// fisherScore[0] = allSoccer*(math.pow(meanSoccer[0]-math.mean(meanAttr[0]),2))/allSoccer*math.pow(varSoccer[0],1);
+	fisherScore[0] = math.pow((meanSoccer[0]-meanSumo[0]),2)/(varSoccer[0]+varSumo[0]);
+	console.log("new fisher : "+fisherScore[0]);
+	fisherScore[1] = math.pow((meanSoccer[1]-meanSumo[1]),2)/(varSoccer[1]+varSumo[1]);
+	console.log("new fisher : "+fisherScore[1]);
+																
+		// var printRumus = "("+allSoccer+"*"+allSumo+")/("+allSoccer+"+"+allSumo+")*("+meanSoccer[i]+"-"+meanSumo[i]+")^2/("+varSumo[i]+"*"+allSumo+"+"+varSoccer[i]+"*"+allSoccer+");";
 	
 });
