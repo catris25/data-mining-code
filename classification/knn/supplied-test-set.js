@@ -7,14 +7,6 @@ var testingData = [];
 var trainingFile = "train.csv";
 var testingFile = "test-A.csv";
 
-// with supplied testing data
-// 10 CV
-// precentage split
-
-var suppliedTestSet = true;
-var cv = false;
-var split = false;
-
 // read training file and save data to array trainingData 
 fs.readFile(trainingFile, "utf8", function(error, train) {
     var rows = train.split("\n");
@@ -24,28 +16,19 @@ fs.readFile(trainingFile, "utf8", function(error, train) {
 	    trainingData.push( cells );
 	  
 	}
+    
+    fs.readFile(testingFile, "utf8", function(error, test){
+        var rows = test.split("\n");
 
-    if(split){
-        var percentage = 67;
-        var trainPercentage = percentage / 100 * trainingData.length;
-        var testPercentage = 100 - trainPercentage;
+        for (var i = 0; i < rows.length; i++) {
+            var cells = rows[i].split(",");
+            testingData.push( cells );
+    
+        }
         
-    }else if(cv){
+        kNN(trainingData, testingData);   
 
-    }else{
-        fs.readFile(testingFile, "utf8", function(error, test){
-            var rows = test.split("\n");
-
-            for (var i = 0; i < rows.length; i++) {
-                var cells = rows[i].split(",");
-                testingData.push( cells );
-        
-            }
-            
-            kNN(trainingData, testingData);   
-
-        });
-    }    
+    });    
 });
 
 // knn function
