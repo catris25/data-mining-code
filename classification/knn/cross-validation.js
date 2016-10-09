@@ -4,60 +4,80 @@ var thisFile = "dataset.csv";
 
 fs.readFile(thisFile, "utf8", function(error, train) {
     var rows = train.split("\n");
-
-	for (var i = 0; i < rows.length; i++) {
+    
+    // BEWARE ABOUT THE ROWS LENGTH
+    // IT COULD BE -1 IT COULD BE NOT
+	for (var i = 0; i < (rows.length-1); i++) {
 	    var cells = rows[i].split(",");
 	    thisData.push( cells );
-	  
+        
 	}
     
+    console.log("data length :"+ thisData.length);
+
     var fold = 10;
-    var testDataLength = (thisData.length-1) / fold;
+    var testDataLength = (thisData.length) / fold;
     console.log(thisData.length+"/"+fold+"="+testDataLength);
     var splitData = new Array(fold-1);
 
-    var testingData = [];
-    var trainingData=[];
+    
+    for(var i=0; i<fold; i++){
+        splitData[i] = new Array();
+             
+        for(var j=0; j<testDataLength; j++){
+            var p = (i+1)*j;    
+            splitData[i].push(thisData[p]);
+        }
+    }
+    
 
-    // for(var i=1; i<=fold; i++){
-    //     for(var j=1; j<=fold; j++){
-    //         splitData[j] = 
-    //     }
-
-    //     for(var j=0; j<testDataLength; j++){
-    //         testingData[j] = thisData[i*j];
-    //     }
+    // WAAAAA INI ERRORRRR
+    // AKU GEMESZZZZZZZ
+    for(var i=0; i<fold; i++){
+        var testingData = splitData[i];
+        var trainingData = new Array();
+        for(var j=0; j<fold; j++){
+            if(i!=j){         
+                trainingData.push(splitData[j]); 
+            }
+        }
+        console.log("training");
+        console.log(trainingData);
         
-    //     // kNN(trainingData, testingData);
-    // }
+        // console.log("testing");
+        // console.log(testingData);
+        return;
+        // kNN(trainingData, testingData);
+    }
+});
 
-});        
 
 // knn function
 function kNN(trainingData, testingData){
     var matrix = new Array();
     var res;
     var attrNum = testingData[0].length;
-    console.log("attrNum: "+attrNum);
-	
+	console.log("attrNum :"+attrNum)
+
     for(var i=0; i<(testingData.length-1); i++){
         
-        matrix[i] = new Array(trainingData.length-1);
+        matrix[i] = new Array();
 
         for(var j=0; j<(trainingData.length-1); j++){
             var temp =0;
             for(var x=0; x<attrNum; x++){
                 temp = temp+ Math.pow((testingData[i][x]-trainingData[j][x]), 2);
+                // console.log("test: "+testingData[i][x]+" train: "+trainingData[j][x]);
             }
             res = Math.pow(temp, 0.5);
             
             matrix[i][j]= new Object();
             matrix[i][j].value = res;
-			matrix[i][j].class = trainingData[j][8];
-
+			matrix[i][j].class = trainingData[j][attrNum-1];
+            // console.log(matrix[i][j]);
         }
     }
-
+    return;
     
     for(var i=0; i<(testingData.length-1); i++){
 			var temp =matrix[i];
