@@ -31,24 +31,25 @@ fs.readFile(thisFile, "utf8", function(error, train) {
     }
     
 
-    // WAAAAA INI ERRORRRR
-    // AKU GEMESZZZZZZZ
+    
     for(var i=0; i<fold; i++){
-        var testingData = splitData[i];
+
+        var fromIndex = i*testDataLength;
+        var toIndex =  i*testDataLength+testDataLength;
+
+        var testingData = thisData.slice(fromIndex, toIndex);
+
         var trainingData = new Array();
-        for(var j=0; j<fold; j++){
-            if(i!=j){         
-                trainingData.push(splitData[j]); 
+
+        for(var j=0; j<(thisData.length); j++){
+            if(!(j>fromIndex && j<(toIndex-1))){
+                trainingData.push(thisData[j]);
             }
         }
-        console.log("training");
-        console.log(trainingData);
-        
-        // console.log("testing");
-        // console.log(testingData);
-        return;
-        // kNN(trainingData, testingData);
+
+        kNN(trainingData, testingData);
     }
+    
 });
 
 
@@ -74,10 +75,9 @@ function kNN(trainingData, testingData){
             matrix[i][j]= new Object();
             matrix[i][j].value = res;
 			matrix[i][j].class = trainingData[j][attrNum-1];
-            // console.log(matrix[i][j]);
+            console.log(matrix[i][j]);
         }
     }
-    return;
     
     for(var i=0; i<(testingData.length-1); i++){
 			var temp =matrix[i];
