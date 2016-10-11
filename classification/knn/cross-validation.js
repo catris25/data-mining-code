@@ -1,4 +1,5 @@
 var fs = require('fs');
+var math = require('mathjs');
 var thisData = [];
 var thisFile = "dataset.csv";    
 
@@ -20,18 +21,7 @@ fs.readFile(thisFile, "utf8", function(error, train) {
     console.log(thisData.length+"/"+fold+"="+testDataLength);
     var splitData = new Array(fold-1);
 
-    
-    for(var i=0; i<fold; i++){
-        splitData[i] = new Array();
-             
-        for(var j=0; j<testDataLength; j++){
-            var p = (i+1)*j;    
-            splitData[i].push(thisData[p]);
-        }
-    }
-    
-
-    
+    var accuracy = new Array();
     for(var i=0; i<fold; i++){
 
         var fromIndex = i*testDataLength;
@@ -47,9 +37,11 @@ fs.readFile(thisFile, "utf8", function(error, train) {
             }
         }
 
-        kNN(trainingData, testingData);
+        accuracy[i] = kNN(trainingData, testingData);
     }
     
+    var totalAccu = math.mean(accuracy);
+    console.log("total accuracy :"+totalAccu);
 });
 
 
@@ -58,13 +50,13 @@ function kNN(trainingData, testingData){
     var matrix = new Array();
     var res;
     var attrNum = testingData[0].length;
-	console.log("attrNum :"+attrNum)
+	
 
-    for(var i=0; i<(testingData.length-1); i++){
+    for(var i=0; i<(testingData.length); i++){
         
         matrix[i] = new Array();
 
-        for(var j=0; j<(trainingData.length-1); j++){
+        for(var j=0; j<(trainingData.length); j++){
             var temp =0;
             for(var x=0; x<attrNum; x++){
                 temp = temp+ Math.pow((testingData[i][x]-trainingData[j][x]), 2);
@@ -75,17 +67,17 @@ function kNN(trainingData, testingData){
             matrix[i][j]= new Object();
             matrix[i][j].value = res;
 			matrix[i][j].class = trainingData[j][attrNum-1];
-            console.log(matrix[i][j]);
+            // console.log(matrix[i][j]);
         }
     }
     
-    for(var i=0; i<(testingData.length-1); i++){
-			var temp =matrix[i];
+    for(var i=0; i<(testingData.length); i++){
+        var temp =matrix[i];
 
-			// sort value in array of object per element of array testingData
-			temp.sort(function(a, b) {
-			   return parseFloat(a.value) - parseFloat(b.value);
-			});
+        // sort value in array of object per element of array testingData
+        temp.sort(function(a, b) {
+            return parseFloat(a.value) - parseFloat(b.value);
+        });
 				
 	}
 
@@ -93,9 +85,11 @@ function kNN(trainingData, testingData){
     var n=0;
     var nOne=0;
     var nTwo=0;
+    var correct = 0;
+    var incorrect = 0;
     console.log("k= "+k);
     
-    for(var i=0; i<(testingData.length-1); i++){
+    for(var i=0; i<(testingData.length); i++){
 
         var one=0;
         var two=0;
@@ -113,18 +107,35 @@ function kNN(trainingData, testingData){
 
         // decide which class the testing data belongs 
         // from the greater number of class of data from training
+        
         if(one>two){
-            console.log("data-"+i+" class: 1. ("+one+")");
+            console.log("data-"+i+" class: 1. ("+one+") should be "+testingData[i][attrNum-1]);
             nOne++;
+            if(testingData[i][attrNum-1]==1){
+                correct++;
+            }else{
+                incorrect++;
+            }
         }else{
-            console.log("data-"+i+" class: 2. ("+two+")");
+            console.log("data-"+i+" class: 2. ("+two+") should be "+testingData[i][attrNum-1]);
             nTwo++;
+            if(testingData[i][attrNum-1]==2){
+                correct++;
+            }else{
+                incorrect++;
+            }
         }
         
     }
 
+    var accuracy = correct/testingData.length;
     console.log("Result: ");
     console.log(">>"+nOne+" data are classified as 1");
     console.log(">>"+nTwo+" data are classified as 2");
+    console.log("<<"+correct+" data are correctly predicted.");
+    console.log("<<"+incorrect+" data are incorrectly predicted.");
+    console.log("accuracy is "+accuracy);
+
+    return accuracy;
 }
 
