@@ -1,7 +1,7 @@
 var fs = require('fs');
 var math = require('mathjs');
 var thisData = [];
-var thisFile = "dataset.csv";    
+var thisFile = "iris.csv";    
 
 fs.readFile(thisFile, "utf8", function(error, train) {
     var rows = train.split("\n");
@@ -13,6 +13,7 @@ fs.readFile(thisFile, "utf8", function(error, train) {
 	    thisData.push( cells );
         
 	}
+    console.log(thisData);
     
     console.log("data length :"+ thisData.length);
 
@@ -41,7 +42,7 @@ fs.readFile(thisFile, "utf8", function(error, train) {
     }
     
     var totalAccu = math.mean(accuracy);
-    console.log("total accuracy :"+totalAccu);
+    console.log("TOTAL ACCURACY = "+totalAccu);
 });
 
 
@@ -49,8 +50,7 @@ fs.readFile(thisFile, "utf8", function(error, train) {
 function kNN(trainingData, testingData){
     var matrix = new Array();
     var res;
-    var attrNum = testingData[0].length;
-	
+    var attrNum = testingData[0].length; 
 
     for(var i=0; i<(testingData.length); i++){
         
@@ -60,14 +60,12 @@ function kNN(trainingData, testingData){
             var temp =0;
             for(var x=0; x<attrNum; x++){
                 temp = temp+ Math.pow((testingData[i][x]-trainingData[j][x]), 2);
-                // console.log("test: "+testingData[i][x]+" train: "+trainingData[j][x]);
             }
             res = Math.pow(temp, 0.5);
             
             matrix[i][j]= new Object();
             matrix[i][j].value = res;
 			matrix[i][j].class = trainingData[j][attrNum-1];
-            // console.log(matrix[i][j]);
         }
     }
     
@@ -81,61 +79,63 @@ function kNN(trainingData, testingData){
 				
 	}
 
-    var k = 1;	// hyperparameter
+    var k = 9;	// hyperparameter
     var n=0;
-    var nOne=0;
-    var nTwo=0;
     var correct = 0;
     var incorrect = 0;
-    console.log("k= "+k);
+    // console.log("k= "+k);
+    
     
     for(var i=0; i<(testingData.length); i++){
 
-        var one=0;
-        var two=0;
-        for(var z=0; z<k; z++){
-            
-            // check the class of data from training 
-            if(matrix[i][z].class==1){
-                one++;
+        var classes = [
+            // [0,'1'],
+            // [0,'2']
+            [0, 'Iris-setosa'],
+            [0, 'Iris-versicolor'],
+            [0, 'Iris-virginica']
+        ];
 
-            }else if(matrix[i][z].class==2){
-                two++;
+        for(var j=0; j<k; j++){
 
-            }	
+            for(var x=0; x<classes.length; x++){
+                if(matrix[i][j].class==classes[x][1]){
+                    classes[x][0]++;
+                }
+            }
+            	
         }
 
         // decide which class the testing data belongs 
         // from the greater number of class of data from training
         
-        if(one>two){
-            console.log("data-"+i+" class: 1. ("+one+") should be "+testingData[i][attrNum-1]);
-            nOne++;
-            if(testingData[i][attrNum-1]==1){
-                correct++;
-            }else{
-                incorrect++;
+        var largest= classes[0][0];
+        var classifiedAs = classes[0][1];
+
+        for (var j = 0; j < classes.length; j++) {
+            
+            if (largest < classes[j][0] ) {
+                largest = classes[j][0];
+                classifiedAs = classes[j][1];
             }
-        }else{
-            console.log("data-"+i+" class: 2. ("+two+") should be "+testingData[i][attrNum-1]);
-            nTwo++;
-            if(testingData[i][attrNum-1]==2){
-                correct++;
-            }else{
-                incorrect++;
-            }
-        }
+        }       
         
+        if(testingData[i][attrNum-1]==classifiedAs){
+            // console.log("data-"+i+" is predicted to be "+classifiedAs);
+            correct++;
+        }else{
+            console.log("data-"+i+" is predicted to be "+classifiedAs+". Should be "+testingData[i][attrNum-1]);
+            incorrect++;
+        }        
     }
 
     var accuracy = correct/testingData.length;
-    console.log("Result: ");
-    console.log(">>"+nOne+" data are classified as 1");
-    console.log(">>"+nTwo+" data are classified as 2");
-    console.log("<<"+correct+" data are correctly predicted.");
-    console.log("<<"+incorrect+" data are incorrectly predicted.");
-    console.log("accuracy is "+accuracy);
+    // console.log("Result: ");
+    // console.log("<<"+correct+" data are correctly predicted.");
+    // console.log("<<"+incorrect+" data are incorrectly predicted.");
+    console.log("accuracy = "+accuracy);
 
     return accuracy;
 }
+
 
