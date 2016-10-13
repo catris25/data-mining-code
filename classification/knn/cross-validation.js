@@ -1,28 +1,35 @@
 var fs = require('fs');
 var math = require('mathjs');
+
 var thisData = [];
-var thisFile = "iris.csv";    
+var thisFile = "gene.csv";    
+
+var k = 1;	// hyperparameter
+var fold = 5;
 
 fs.readFile(thisFile, "utf8", function(error, train) {
+    console.log("k-NN on "+thisFile+" with k="+k);
+
     var rows = train.split("\n");
     
     // BEWARE ABOUT THE ROWS LENGTH
     // IT COULD BE -1 IT COULD BE NOT
-	for (var i = 0; i < (rows.length-1); i++) {
+    var i=0;
+	for (;rows[i];) {
 	    var cells = rows[i].split(",");
 	    thisData.push( cells );
         
+        i++;
 	}
-    console.log(thisData);
+    // console.log(thisData);
     
     console.log("data length :"+ thisData.length);
 
-    var fold = 10;
     var testDataLength = (thisData.length) / fold;
     console.log(thisData.length+"/"+fold+"="+testDataLength);
-    var splitData = new Array(fold-1);
-
+    
     var accuracy = new Array();
+
     for(var i=0; i<fold; i++){
 
         var fromIndex = i*testDataLength;
@@ -37,7 +44,7 @@ fs.readFile(thisFile, "utf8", function(error, train) {
                 trainingData.push(thisData[j]);
             }
         }
-
+        console.log("Fold-"+i+":");
         accuracy[i] = kNN(trainingData, testingData);
     }
     
@@ -52,49 +59,59 @@ function kNN(trainingData, testingData){
     var res;
     var attrNum = testingData[0].length; 
 
-    for(var i=0; i<(testingData.length); i++){
+    var i=0;
+    for(;testingData[i];){
         
         matrix[i] = new Array();
 
-        for(var j=0; j<(trainingData.length); j++){
+        var j=0;
+        for(;trainingData[j];){
             var temp =0;
-            for(var x=0; x<attrNum; x++){
-                temp = temp+ Math.pow((testingData[i][x]-trainingData[j][x]), 2);
+            for(var x=0; x<(attrNum-1); x++){
+                temp = parseFloat(temp)+ parseFloat(Math.pow((testingData[i][x]-trainingData[j][x]), 2));
+                
             }
-            res = Math.pow(temp, 0.5);
+            res = parseFloat(Math.pow(temp, 0.5));
             
             matrix[i][j]= new Object();
             matrix[i][j].value = res;
 			matrix[i][j].class = trainingData[j][attrNum-1];
+
+            j++;
         }
+        i++;
     }
     
-    for(var i=0; i<(testingData.length); i++){
+    var i=0;
+    for(;testingData[i];){
         var temp =matrix[i];
 
         // sort value in array of object per element of array testingData
         temp.sort(function(a, b) {
             return parseFloat(a.value) - parseFloat(b.value);
         });
-				
+        
+        i++;
 	}
 
-    var k = 9;	// hyperparameter
-    var n=0;
+    
     var correct = 0;
     var incorrect = 0;
-    // console.log("k= "+k);
     
-    
-    for(var i=0; i<(testingData.length); i++){
+    var i=0;
+    for(;testingData[i];){
 
         var classes = [
-            // [0,'1'],
-            // [0,'2']
-            [0, 'Iris-setosa'],
-            [0, 'Iris-versicolor'],
-            [0, 'Iris-virginica']
-        ];
+            [0, 'EWS'],
+            [0, 'BL']
+            // [0,'tested_positive'],
+            // [0,'tested_negative']
+            // [0, 'Iris-versicolor'],
+            // [0, 'Iris-setosa'],
+            // [0, 'Iris-virginica']
+            // [0, '1'],
+            // [0, '2']
+        ];    
 
         for(var j=0; j<k; j++){
 
@@ -124,15 +141,16 @@ function kNN(trainingData, testingData){
             // console.log("data-"+i+" is predicted to be "+classifiedAs);
             correct++;
         }else{
-            console.log("data-"+i+" is predicted to be "+classifiedAs+". Should be "+testingData[i][attrNum-1]);
+            // console.log("data-"+i+" is predicted to be "+classifiedAs+". Should be "+testingData[i][attrNum-1]);
             incorrect++;
-        }        
+        }
+        i++;        
     }
 
     var accuracy = correct/testingData.length;
-    // console.log("Result: ");
-    // console.log("<<"+correct+" data are correctly predicted.");
-    // console.log("<<"+incorrect+" data are incorrectly predicted.");
+    
+    console.log("<<"+correct+" data are correctly predicted.");
+    console.log("<<"+incorrect+" data are incorrectly predicted.");
     console.log("accuracy = "+accuracy);
 
     return accuracy;
