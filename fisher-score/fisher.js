@@ -1,5 +1,5 @@
 // fisher score
-
+	
 var fs = require('fs');
 var math = require('mathjs');
 var inputData = [];
@@ -19,7 +19,8 @@ fs.readFile(fileName, "utf8", function(error, data) {
 	// var className = ['tested_positive', 'tested_negative'];
 	var className = ['soccer', 'sumo'];
 
-
+	console.log("Original data:");
+	console.log(inputData);
 	// create array to store data per attribute per class
 	var attrFirst=new Array();
 	var attrSecond=new Array();
@@ -31,6 +32,11 @@ fs.readFile(fileName, "utf8", function(error, data) {
 	sortedData[0] = linearScaling(sortedData[0]);
 	sortedData[1] = linearScaling(sortedData[1]);
 	// sortedData[2] = linearScaling(sortedData[2]);
+	// sortedData[3] = linearScaling(sortedData[3]);
+	// sortedData[4] = linearScaling(sortedData[4]);
+	// sortedData[5] = linearScaling(sortedData[5]);
+	// sortedData[6] = linearScaling(sortedData[6]);
+	// sortedData[7] = linearScaling(sortedData[7]);
 	
 	
 	
@@ -98,7 +104,11 @@ fs.readFile(fileName, "utf8", function(error, data) {
 
 
 function linearScaling(unscaledData){
-	// console.log("unscaledData:"+unscaledData);
+	
+	for (var i = 0; i < unscaledData.length; i++) {
+        unscaledData[i] = parseFloat(unscaledData[i]);
+    }
+
 	var minValue = math.min(unscaledData);
 	var maxValue = math.max(unscaledData);
 	var range = maxValue-minValue;
@@ -110,7 +120,9 @@ function linearScaling(unscaledData){
 		
 		unscaledData[i] = newX;
 	}
-	console.log("scaled :"+unscaledData[0]);
+
+	console.log("Scaling result: "+unscaledData);
+	
 	return unscaledData;
 }
 
