@@ -1,0 +1,19 @@
+{
+  "name": "naive-bayes",
+  "version": "1.0.0",
+  "description": "naive bayes classification technique in data mining",
+  "main": "naive-bayes.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "github.com/catris25"
+  },
+  "keywords": [
+    "data",
+    "mining"
+  ],
+  "author": "Lia Ristiana",
+  "license": "ISC"
+}
