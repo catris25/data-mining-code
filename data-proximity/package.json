@@ -1,0 +1,23 @@
+{
+  "name": "data-proximity",
+  "version": "1.0.0",
+  "description": "data proximity like euclidian, mahalanobis etc",
+  "main": "euclidian-distance.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/github.com/catris25.git"
+  },
+  "keywords": [
+    "data",
+    "mining"
+  ],
+  "author": "Lia Ristiana",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/github.com/catris25/issues"
+  },
+  "homepage": "https://github.com/github.com/catris25#readme"
+}

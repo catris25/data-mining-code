@@ -1,0 +1,31 @@
+var fs = require('fs');
+var math = require('mathjs');
+var minkowski = require( 'compute-minkowski-distance' );
+
+var dataFile = "dataset.csv";
+
+var inputData = [];
+
+// read file and save data to array
+fs.readFile(dataFile, "utf8", function(error, data) {
+	var rows = data.split("\n");
+
+	for (var i = 0; i < (rows.length-1); i++) {
+		var cells = rows[i].split(",");
+		inputData.push( cells );
+
+	}
+
+	console.log("Calculating Minkowski Distance");
+
+	var matrix = new Array();
+	for(var i=0; i<inputData.length; i++){
+		matrix[i]= new Array();
+
+		for(var j=0; j<inputData.length; j++){
+			matrix[i][j] = minkowski(inputData[j], inputData[i]);
+		}
+	}
+
+	console.log(matrix)
+});
