@@ -49,92 +49,87 @@ fs.readFile(trainingFile, "utf8", function(error, train) {
 		}
 
 
-		// for(var i=0; i<attrNum; i++){
 
-		// 	for(j=0; j<)
-		// }
-	
-		for(var i=0; i<(attrNum); i++){
+		for(var i=0; i<classNames.length; i++){
 
-			for(var j=0; j<attrs.length; j++){
-				
-				classNames[j][0] = 0;
-			}
-			
-			for(var x=0; x<trainingData.length; x++){
-				console.log(attrs[i]);
-				return;
-				attrs[i][x] = new Array();
+			for(var j=0; j<attrNum; j++){
+				attrs[i][j] = new Array();
 
-				for(var y=0; y<attrs.length; y++){
-					// console.log("x:"+x+"...j:"+j+": "+trainingData[i][attrNum]);
-					if(trainingData[x][attrNum]==classNames[y][1]){
-						attrs[i][x].push(trainingData[x][i]);
-						// console.log("breakout: "+trainingData[x][j]);
-						classNames[y][0]++;
-						break;
+				classNames[i][0]=0;
+
+				for(var x=0; x<trainingData.length; x++){
+					if(trainingData[x][attrNum]==classNames[i][1]){
+						
+						attrs[i][j].push(trainingData[x][j]);
+						classNames[i][0]++;
 					}
 				}
-
 			}
 		}
-		// console.log(attrs);
-		return;
 
+		// calculating mean and variance
+		var meanValues = new Array();
+		var varValues = new Array()
+
+		for(var i=0; i<classNames.length; i++){
+			meanValues[i] = new Array();
+			varValues[i] = new Array();
+
+			for(var j=0; j<attrs[i].length; j++){
+				meanValues[i][j] = math.mean(attrs[i][j]);
+				varValues[i][j] = math.var(attrs[i][j]);
+			}
+		}
+
+		// calculating posterior probability
+		var posterior = new Array();
+
+		for(var i=0; i<classNames.length; i++){
+			posterior[i] = classNames[i][0]/trainingData.length;
+		}
+
+		// calculating likelihood
+		var likelihood = new Array();
+
+		var pi = math.eval('pi');
+		var e = math.eval('e');
+
+		for(var i=0; i<classNames.length; i++){
+
+			likelihood[i] = new Array();
+			for(var j=0; j<attrs[i].length; j++){
+				likelihood[i][j] = (1/math.sqrt(2*pi*varValues[i][j]))*
+				math.pow(e, -(math.pow((testingData[0][j]-meanValues[i][j]),2))/(2*varValues[i][j]));
+				
+			}
+		}
+
+		
+		var evidence= new Array();
+		for(var i=0; i<classNames.length; i++){
+			
+			var temp = 1;
+
+			for(var j=0; j<likelihood[i].length; j++){
+				temp = temp*likelihood[i][j];
+			}
+			evidence[i] = temp;
+		}
+
+		// console.log(evidence);
+
+		var probability = new Array();
+		for(var i=0; i<classNames.length; i++){
+			probability[i] = evidence[i]*posterior[i];
+		}
+		// console.log(probability);
+
+
+		// CONCLUSION
+		for(var i=0; i<classNames.length; i++){
+			console.log("P("+classNames[i][1]+") = "+probability[i]);
+		}
 	});
-
-	// // calculating mean and var of EWS
-	// for(var i=0; i<attrEWS.length; i++){
-	// 	meanEWS[i] = math.mean(attrEWS[i]);
-	// 	varEWS[i] = math.var(attrEWS[i]);
-
-	// }
-
-	// // calculating mean and var of BL
-	// for(var i=0; i<attrBL.length; i++){
-	// 	meanBL[i] = math.mean(attrBL[i]);
-	// 	varBL[i] = math.var(attrBL[i]);
-	// }
-
-	// // calculating posterior probability
-	// var posteriorEWS = allEWS/trainingData.length;
-	// var posteriorBL = allBL/trainingData.length;
-	
-	// // calculating likelihood
-	// var likeEWS = new Array();
-	// var likeBL = new Array();
-
-	// var pi = math.eval('pi');
-	// var e = math.eval('e');
-
-	// for(var i=0; i<attrEWS.length; i++)	{
-
-	// 	likeEWS[i] = (1/math.sqrt(2*pi*varEWS[i])) * math.pow(e, -(math.pow((testingData[i]-meanEWS[i]),2))/(2*varEWS[i]));
-	// }
-	
-	// for(var i=0; i<attrBL.length; i++)	{
-
-	// 	likeBL[i] = (1/math.sqrt(2*pi*varBL[i])) * math.pow(e, -(math.pow((testingData[i]-meanBL[i]),2))/(2*varBL[i]));
-	// }
-	
-	// var temp = 1;
-
-	// for(var i=0; i<likeEWS.length; i++)	{
-	// 	temp=temp*likeEWS[i];
-	// }
-	// var eviEWS = temp;	
-
-	// var temp = 1;
-	// for(var i=0; i<likeBL.length; i++)	{
-	// 	temp=temp*likeBL[i];
-	// }
-	// var eviBL = temp;	
-	
-	// var probEWS = eviEWS*posteriorEWS;
-	// var probBL = eviBL*posteriorBL;
-
-	// console.log("P(EWS) = "+probEWS);
-	// console.log("P(BL) = "+probBL);
 
 	// // conclusion
 	// console.log("Result:");
