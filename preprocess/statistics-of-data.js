@@ -17,6 +17,8 @@ var attributeType = [
     'numeric'
 ];    
 
+var attrNum = attributeType.length;
+
 fs.readFile(thisFile, "utf8", function(error, data) {
     var rows = data.split("\n");
     var thisData= [];
@@ -74,6 +76,20 @@ function calculateSum(sortedData){
         
     }
     return sumAttr;
+}
+
+function calculateMean2(sortedData){
+    var total = 0;
+    var c=0;
+    for (var i = 0; i < sortedData.length; i++) {
+        if(sortedData[i]!='?'){
+            total += sortedData[i];
+            c++;    
+        }
+        
+    }
+    var mean = total/c;
+
 }
 
 
